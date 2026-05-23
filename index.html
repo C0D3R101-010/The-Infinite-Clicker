@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>The Infinite Clicker</title>
+		<style>
+            * {
+                margin: 0px;
+            }
+            body {
+                background: radial-gradient(
+                    circle at calc(50% + 205px) calc(50% + 50px),
+                    hwb(5 30% 60%) 0%,
+                    hwb(6 35% 45%) 40%,
+                    hwb(7 40% 30%) 120%
+                );
+            }
+            @keyframes rotation {
+                0% {transform: rotate(5deg);}
+                50% {transform: rotate(-5deg);}
+                100% {transform: rotate(5deg);}
+            }
+            #boxRotator {
+                animation: rotation 4s infinite;
+                position: absolute;
+                top: calc(50% + 50px);
+                left: calc(50% + 205px);
+            }
+            #box {
+                width: 100px;
+                height: 100px;
+                background-image: radial-gradient(hwb(0 40% 0%), hwb(0 40% 30%));
+                border: 10px solid hwb(0 20% 40%);
+                position: absolute;
+                border-radius: 30%;
+                transform-origin: center;
+                transition: transform 0.4s ease;
+                transform: translate(-50%, -50%);
+            }
+            #box:hover {
+                cursor: pointer;
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+            #box:active {
+                transition: transform 0.2s ease;
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+            #score, #rPoints {
+                position: absolute;
+                font: 75px Fantasy;
+                color: hwb(0 20% 60%);
+                transform-origin: 50% 50%;
+                transition: transform 0.05s ease;
+                transform: translate(-50%);
+            }
+            #score {
+                top: 40px;
+                left: calc(50% + 205px);
+                text-shadow:
+                    0 0 15px hwb(0 20% 60%),
+                    0 0 30px hwb(0 40% 40%),
+                    0 0 45px hwb(0 60% 20%);
+            }
+            #rPoints{
+                top: 10px;
+                left: 50%;
+            }
+            #score:hover, #rPoints:hover, #cpxDisplay:hover, #cLvlDisplay:hover {cursor: default;}
+            #cpxDisplay {
+                font: 25px/40px monospace;
+                color: hwb(0 10% 70%);
+                min-width: 6ch;
+                white-space: nowrap;
+                height: 80px;
+                border-radius: 20px 20px 0 0;
+                position: absolute;
+                bottom: 0px;
+                left: 460px;
+                background-image: linear-gradient(to bottom, hwb(0 20% 60%), hwb(0 25% 50%));
+                padding: 20px;
+                border: 3px solid hwb(0 10% 70%);
+                border-bottom: none;
+                box-shadow: 0 0 30px 10px hwb(5 40% 20%);
+                text-shadow:
+                    0 0 10px hwb(5 40% 20%),
+                    0 0 20px hwb(5 50% 10%);
+            }
+            #shop {
+                position: relative;
+                width: 410px;
+                height: 100vh;
+            }
+            #shopBG {
+                width: 410px;
+                height: 100%;
+                background-color: hwb(0 20% 60%);
+                position: absolute;
+                inset: 0px;
+            }
+            .upg {
+                width: 150px;
+                height: 50px;
+                font: 12px/calc(50px/3) monospace;
+                text-align: center;
+                color: hwb(0 20% 60%);
+                position: absolute;
+                background-image: radial-gradient(hwb(0 40% 0%), hwb(0 40% 30%));
+                border: 10px solid hwb(0 20% 40%);
+                border-radius: 15px;
+                transform: translate(0, -50%);
+            }
+            .upg:hover {
+                cursor: pointer;
+                transform: translate(0, -50%) scale(1.1);
+            }
+            .upg:active {
+                transform: translate(0, -50%) scale(1.2);
+            }
+            #box, #shopBG, .upg {box-shadow: 0 0 30px 10px hwb(0 40% 30%);}
+            #rTBG {
+                width: 100vw;
+                height: 100vh;
+                position: absolute;
+                inset: 0px;
+                background: rgba(0, 0, 0, 0.5);
+            }
+            #rText {
+                width: 200px;
+                height: 200px;
+                position: relative;
+                margin: 0px;
+                padding: 10px;
+                inset: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 15px;
+                font: 14px monospace;
+                text-align: center;
+            }
+            #rButton, #nR {
+                width: 80px;
+                height: 40px;
+                bottom: 10px;
+                color: hwb(0 40% 30%);
+                position: absolute;
+                background-image: radial-gradient(hwb(0 20% 70%), hwb(0 30% 60%));
+                border: 5px solid hwb(0 0% 80%);
+                border-radius: 5px;
+                transition: scale 0.4s ease;
+            }
+            #rButton {
+                left: 10px;
+            }
+            #nR {
+                right: 10px;
+            }
+            #rButton:hover, #nR:hover {
+                scale: 1.15;
+            }
+            #rButton:active, #nR:active {
+                scale: 1.2;
+            }
+            .rupg, #exit {box-shadow: 0 0 20px 5px hwb(0 0% 90%);}
+            #rText, #rPoints, .rupg, #exit {
+                text-shadow:
+                    0 0 15px hwb(0 20% 60%),
+                    0 0 30px hwb(0 10% 75%),
+                    0 0 45px hwb(0 0% 90%);
+            }
+            #rebirthBG {
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(
+                    circle at center,
+                    hwb(5 20% 70%) 0%,
+                    hwb(260 10% 90%) 100%
+                );
+                min-height: 100vh;
+            }
+            .rupg {
+                width: calc(50% - 50px);
+                height: calc(20% - 40px);
+                font: 20px/calc(calc(20vh - 40px)/3) monospace;
+                text-align: center;
+                border-radius: 15px;
+                transform: translate(0, -50%);
+            }
+            .rupg:hover {
+                cursor: pointer;
+                transform: translate(0, -50%) scale(1.01);
+            }
+            #rupg1, #rupg2, #rupg3, #rupg4 {left: 20px;}
+            #rupg5, #rupg6, #rupg7, #rupg8 {right: 20px;}
+            #rupg1, #rupg5 {top: calc(20% + 35px);}
+            #rupg2, #rupg6 {top: calc(40% + 40px);}
+            #rupg3, #rupg7 {top: calc(60% + 45px);}
+            #rupg4, #rupg8 {top: calc(80% + 50px);}
+            #exit {
+                width: 140px;
+                height: 40px;
+                font: 16px/12px monospace;
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                border-radius: 6px;
+                transform-origin: center;
+            }
+            #exit:hover {
+                cursor: pointer;
+                transform: scale(1.05);
+            }
+            #rText, .rupg, #exit {
+                color: hwb(0 40% 30%);
+                position: absolute;
+                background-image: radial-gradient(hwb(0 30% 60%), hwb(0 20% 70%));
+                border: 10px solid hwb(0 0% 80%);
+            }
+        </style>
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1"></script>
+		<script>
+            $(() => {
+                var score = 0;
+                var tscore = 0;
+                var $score = $("#score");
+                var upgCosts = [
+                    500,
+                    1200,
+                    2500,
+                    4500,
+                    6000,
+                    10000,
+                    10000,
+                    19000,
+                    25000
+                ];
+                var upgTypes = [
+                    "c",
+                    "s",
+                    "s",
+                    "c",
+                    "s",
+                    "s",
+                    "c",
+                    "s",
+                    "s",
+                    "r"
+                ];
+                var upgChs = [
+                    1,
+                    1,
+                    3,
+                    10,
+                    7,
+                    13,
+                    24,
+                    26,
+                    36
+                ];
+                var rupgCosts = [
+                    100000,
+                    400000,
+                    200000,
+                    800000,
+                    500000,
+                    1000000,
+                    250000,
+                    1000000
+                ];
+                var rupgChs = [
+                    0.1, 0, 0,
+                    0.5, 0, 0,
+                    0, 0.1, 0,
+                    0, 0.5, 0,
+                    0, 0, 0.001,
+                    0, 0, 0.005,
+                    0.1, 0.1, 0,
+                    0.5, 0.5, 0
+                ];
+                var cpc = 1;
+                var cps = 0;
+                var cLvl = 0;
+                var cpcM = 1;
+                var cpsM = 1;
+                var scoreM = 1;
+                var rPoints = 0;
+                function scoreUpdate() {
+                    $score.text(Math.round(score));
+                    $score.css("transform", "translate(-50%) scale(1.15)");
+                    cLvl = Math.floor(Math.sqrt(score / 1000000));
+                    $("#cLvlText").text(cLvl);
+                    window.setTimeout(() => {
+                        $score.css("transform", "translate(-50%)");
+                    }, 60);
+                };
+                function cpxUpdate() {
+                    $("#cpcDisplay").text(Math.round((cpc * cpcM)));
+                    $("#cpsDisplay").text(cps * cpsM);
+                    $("#cpxDisplay").css("width", Math.max(cpc.toString().length, cps.toString().length) + 5 + "ch");
+                };
+                function rPointsUpdate() {
+                    $("#rPoints").text(rPoints);
+                    $("#rPoints").css("transform", "translate(-50%) scale(1.15)");
+                    window.setTimeout(() => {
+                        $("#rPoints").css("transform", "translate(-50%)");
+                    }, 60);
+                };
+                $("#rebirth").hide();
+                $("#rebirthBG").hide();
+                $("#rTBG").hide();
+                $("#rText").hide();
+                window.setInterval(
+                    () => {
+                        if (cps > 0) {
+                            score = score + cps * cpsM;
+                            tscore = tscore + cps * cpsM;
+                        };
+                        score *= scoreM;
+                        tscore *= scoreM;
+                        if (cps > 0 || scoreM > 1) {
+                            scoreUpdate();
+                        };
+                    },
+                    1000
+                );
+                $("#box").click(
+                    () => {
+                        score = score + cpc * cpcM;
+                        tscore = tscore + cpc * cpcM;
+                        scoreUpdate();
+                    }
+                );
+                for (var i = 1; i < 6; i++) {
+                    $("#upg" + i).css("top", i * 18 - 4 + "%");
+                    $("#upg" + i).css("left", "20px");
+                };
+                for (var i = 6; i < 11; i++) {
+                    $("#upg" + i).css("top", (i - 5) * 18 - 4 + "%");
+                    $("#upg" + i).css("left", "210px");
+                    if (i == 8) {
+                        $("#upg" + i).css("line-height", "12.5px");
+                    };
+                };
+                function showRText() {
+                    rPoints = Math.round((tscore / 50) + (tscore * cLvl));
+                    $("#rTBG").fadeIn(1000);
+                    $("#fRPoints").text(rPoints);
+                    $("#rText").fadeIn(1000);
+                };
+                function rebirth() {
+                    rPointsUpdate();
+                    $("#rTBG").fadeOut(2000);
+                    $("#rText").fadeOut(2000);
+                    $("#rebirthBG").fadeIn(2000,
+                        () => {
+                            $("#main").fadeOut();
+                            $("#rebirth").fadeIn(2000);
+                        }
+                    );
+                };
+                for (let i = 0; i < 10; i++) {
+                    $("#upg" + (i + 1)).click(
+                        () => {
+                            if (upgTypes[i] === "r") {
+                                showRText();
+                            } else {
+                                if (score >= upgCosts[i]) {
+                                    score -= upgCosts[i];
+                                    scoreUpdate();
+                                    if (upgTypes[i] === "c"){
+                                        cpc += upgChs[i];
+                                    } else {
+                                        cps += upgChs[i];
+                                    };
+                                    cpxUpdate();
+                                };
+                            }
+                        }
+                    );
+                };
+                for (let i = 0; i < 8; i++) {
+                    $("#rupg" + (i + 1)).click(
+                        () => {
+                            if (rPoints >= rupgCosts[i]) {
+                                rPoints -= rupgCosts[i];
+                                rPointsUpdate();
+                                cpcM += rupgChs[i * 3];
+                                cpsM += rupgChs[i * 3 + 1];
+                                scoreM += rupgChs[i * 3 + 1];
+                            };
+                        }
+                    );
+                };
+                $("#rButton").click(() => {rebirth();});
+                $("#nR").click(
+                    () => {
+                        $("#rTBG").fadeOut(500);
+                        $("#rText").fadeOut(500);
+                    }
+                );
+                $("#exit").click(
+                    () => {
+                        score = 0;
+                        cpc = 1;
+                        cps = 0;
+                        scoreUpdate();
+                        $("#main").fadeIn();
+                        $("#rebirth").fadeOut(2000, () => {
+                            $("#rebirthBG").fadeOut(2000);
+                        });
+                    }
+                );
+            });
+        </script>
+	</head>
+	<body>
+		<div id="main">
+			<div id="boxRotator">
+				<div id="box"></div>
+			</div>
+			<div id="score">0</div>
+			<div id="shop">
+				<div id="shopBG"></div>
+				<div class="upg" id="upg1">Molecular Vibration<br>CPC + 1<br>Cost: 500</div>
+				<div class="upg" id="upg2">Atomic Clock<br>CPS + 1<br>Cost: 1200</div>
+				<div class="upg" id="upg3">Extra Atoms<br>CPS + 3<br>Cost: 2500</div>
+				<div class="upg" id="upg4">Nuclear Fuser<br>CPC + 10<br>Cost: 4500</div>
+				<div class="upg" id="upg5">Bigger Particles<br>CPS + 7<br>Cost: 6000</div>
+				<div class="upg" id="upg6">New Molecule<br>CPS + 13<br>Cost: 10000</div>
+				<div class="upg" id="upg7">Quantum Clicks<br>CPC + 24<br>Cost: 10000</div>
+				<div class="upg" id="upg8">Higher Particle<br>Physics<br>CPS + 26<br>Cost: 19000</div>
+				<div class="upg" id="upg9">Nuclear Fission<br>CPS + 36<br>Cost: 25000</div>
+				<div class="upg" id="upg10">Reincarnate<br>Buy perm upgrades<br>Full Reset</div>
+			</div>
+			<div id="cpxDisplay">CPC: <span id="cpcDisplay">1</span><br>CPS: <span id="cpsDisplay">0</span></div>
+		</div>
+		<div id="rTBG"></div>
+		<div id="rText">Are you sure you want to reincarnate? You will lose all score, cpc, and cps. Your total score<br>(all time) will be converted into cosmo sparks. Reincarnating now would grant you <span id="fRPoints"></span> cosmo sparks. <button id="rButton">Continue</button><button id="nR">Go back</button></div>
+		<div id="rebirthBG"></div>
+		<div id="rebirth">
+			<div id="rPoints"></div>
+			<button id="exit">Reincarnate</button>
+			<div class="rupg" id="rupg1">Optimized Particle Physics Lvl 1<br>Boost CPC by 10%<br>Cost: 100000</div>
+			<div class="rupg" id="rupg2">Optimized Particle Physics Lvl 2<br>Boost CPC by 50%<br>Cost: 400000</div>
+			<div class="rupg" id="rupg3">Overclocked Reality Lvl 1<br>Boost CPS by 10%<br>Cost: 200000</div>
+			<div class="rupg" id="rupg4">Overclocked Reality Lvl 2<br>Boost CPS by 50%<br>Cost: 800000</div>
+			<div class="rupg" id="rupg5">Universal Loophole Lvl 1<br>Multiply score by 1.001/sec<br>Cost: 500000</div>
+			<div class="rupg" id="rupg6">Universal Loophole Lvl 2<br>Multiply score by 1.005/sec<br>Cost: 1000000</div>
+			<div class="rupg" id="rupg7">Quantum Threading Lvl 1<br>Production multiplier 10%<br>Cost: 250000</div>
+			<div class="rupg" id="rupg8">Quantum Threading Lvl 2<br>Production multiplier 50%<br>Cost: 1000000</div>
+		</div>
+	</body>
+</html>
